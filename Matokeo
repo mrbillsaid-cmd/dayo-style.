@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Student Results Portal</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0f172a, #2563eb);
+      color: white;
+      text-align: center;
+      padding: 30px 15px;
+    }
+
+    header h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      opacity: 0.9;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 900px;
+      margin: 30px auto;
+    }
+
+    .search-box {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .search-box h2 {
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 70%;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 13px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      margin-left: 5px;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    #result {
+      display: none;
+      background: white;
+      margin-top: 25px;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .student-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+      background: #f8fafc;
+      padding: 18px;
+      border-radius: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      padding: 13px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+    }
+
+    th {
+      background: #2563eb;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .card {
+      padding: 18px;
+      background: #eff6ff;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .card h3 {
+      color: #2563eb;
+      margin-bottom: 8px;
+    }
+
+    .print-btn {
+      margin-top: 20px;
+      background: #16a34a;
+    }
+
+    .print-btn:hover {
+      background: #15803d;
+    }
+
+    .error {
+      color: #dc2626;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      margin-top: 40px;
+      background: #0f172a;
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 24px;
+      }
+
+      input {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      button {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .student-info {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      th, td {
+        padding: 9px 5px;
+      }
+    }
+
+    @media print {
+      .search-box,
+      .print-btn,
+      footer {
+        display: none;
+      }
+
+      body {
+        background: white;
+      }
+
+      #result {
+        display: block !important;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🏫 STUDENT RESULTS PORTAL</h1>
+  <p>Check your examination results online</p>
+</header>
+
+<div class="container">
+
+  <div class="search-box">
+    <h2>Check Your Results</h2>
+
+    <input
+      type="text"
+      id="regNumber"
+      placeholder="Enter Registration Number"
+    >
+
+    <button onclick="searchResult()">Search Result</button>
+
+    <p id="error" class="error"></p>
+  </div>
+
+  <div id="result">
+
+    <h2 style="text-align:center;">STUDENT EXAMINATION RESULT</h2>
+
+    <div class="student-info">
+      <div><strong>Name:</strong> <span id="studentName"></span></div>
+      <div><strong>Reg No:</strong> <span id="studentReg"></span></div>
+      <div><strong>Class:</strong> <span id="studentClass"></span></div>
+      <div><strong>Year:</strong> <span id="studentYear"></span></div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Marks</th>
+          <th>Grade</th>
+          <th>Remark</th>
+        </tr>
+      </thead>
+
+      <tbody id="subjects"></tbody>
+    </table>
+
+    <div class="summary">
+      <div class="card">
+        <h3>Total</h3>
+        <p id="total"></p>
+      </div>
+
+      <div class="card">
+        <h3>Average</h3>
+        <p id="average"></p>
+      </div>
+
+      <div class="card">
+        <h3>Position</h3>
+        <p id="position"></p>
+      </div>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">
+      🖨️ Print Result
+    </button>
+
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 Student Results Portal | All Rights Reserved</p>
+</footer>
+
+<script>
+
+  // SAMPLE STUDENT DATA
+  const students = {
+
+    "ST001": {
+      name: "Ali Hassan",
+      class: "Form Four",
+      year: "2026",
+      position: "2nd",
+      subjects: {
+        Mathematics: 85,
+        English: 78,
+        Kiswahili: 88,
+        Physics: 74,
+        Chemistry: 81,
+        Biology: 90
+      }
+    },
+
+    "ST002": {
+      name: "Amina Said",
+      class: "Form Four",
+      year: "2026",
+      position: "1st",
+      subjects: {
+        Mathematics: 92,
+        English: 89,
+        Kiswahili: 94,
+        Physics: 87,
+        Chemistry: 91,
+        Biology: 95
+      }
+    },
+
+    "ST003": {
+      name: "Mohamed Omar",
+      class: "Form Four",
+      year: "2026",
+      position: "3rd",
+      subjects: {
+        Mathematics: 72,
+        English: 76,
+        Kiswahili: 80,
+        Physics: 69,
+        Chemistry: 75,
+        Biology: 83
+      }
+    }
+
+  };
+
+
+  function getGrade(mark) {
+
+    if (mark >= 80) return ["A", "Excellent"];
+    if (mark >= 70) return ["B", "Very Good"];
+    if (mark >= 60) return ["C", "Good"];
+    if (mark >= 50) return ["D", "Pass"];
+    if (mark >= 40) return ["E", "Satisfactory"];
+
+    return ["F", "Fail"];
+  }
+
+
+  function searchResult() {
+
+    const reg = document
+      .getElementById("regNumber")
+      .value
+      .trim()
+      .toUpperCase();
+
+    const error = document.getElementById("error");
+    const result = document.getElementById("result");
+
+    error.textContent = "";
+    result.style.display = "none";
+
+    if (reg === "") {
+      error.textContent = "Please enter your registration number.";
+      return;
+    }
+
+    const student = students[reg];
+
+    if (!student) {
+      error.textContent =
+        "Student not found. Please check your registration number.";
+      return;
+    }
+
+    document.getElementById("studentName").textContent =
+      student.name;
+
+    document.getElementById("studentReg").textContent =
+      reg;
+
+    document.getElementById("studentClass").textContent =
+      student.class;
+
+    document.getElementById("studentYear").textContent =
+      student.year;
+
+    document.getElementById("position").textContent =
+      student.position;
+
+
+    const subjectsTable =
+      document.getElementById("subjects");
+
+    subjectsTable.innerHTML = "";
+
+    let total = 0;
+    let count = 0;
+
+    for (const subject in student.subjects) {
+
+      const mark = student.subjects[subject];
+
+      const gradeInfo = getGrade(mark);
+
+      total += mark;
+      count++;
+
+      const row = `
+        <tr>
+          <td>${subject}</td>
+          <td>${mark}</td>
+          <td>${gradeInfo[0]}</td>
+          <td>${gradeInfo[1]}</td>
+        </tr>
+      `;
+
+      subjectsTable.innerHTML += row;
+    }
+
+
+    const average = total / count;
+
+    document.getElementById("total").textContent =
+      total;
+
+    document.getElementById("average").textContent =
+      average.toFixed(2);
+
+
+    result.style.display = "block";
+  }
+
+</script>
+
+</body>
+</html>
